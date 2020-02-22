@@ -2,7 +2,8 @@ import os, argparse
 import cv2, spacy, numpy as np
 from keras.models import model_from_json
 from keras.optimizers import SGD
-from sklearn.externals import joblib
+from sklearn.externals import joblib #delete
+from sklearn.preprocessing import LabelEncoder #add
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from keras import backend as K
 K.set_image_data_format('channels_first')
@@ -12,7 +13,8 @@ K.set_image_dim_ordering('th')
 # File paths for the model, all of these except the CNN Weights are 
 # provided in the repo, See the models/CNN/README.md to download VGG weights
 VQA_weights_file_name   = 'models/VQA/VQA_MODEL_WEIGHTS.hdf5'
-label_encoder_file_name = 'models/VQA/FULL_labelencoder_trainval.pkl'
+# label_encoder_file_name = 'models/VQA/FULL_labelencoder_trainval.pkl'  delete
+label_encoder_file_name = 'models/VQA/FULL_labelencoder_trainval.pkl_01.npy' #add
 CNN_weights_file_name   = 'models/CNN/vgg16_weights.h5'
 
 # Chagne the value of verbose to 0 to avoid printing the progress statements
@@ -112,7 +114,11 @@ def main():
     # this means some of the answers were not part of trainng and thus would 
     # not show up in the result.
     # These 1000 answers are stored in the sklearn Encoder class
-    labelencoder = joblib.load(label_encoder_file_name)
+#     labelencoder = joblib.load(label_encoder_file_name)
+    labelencoder = LabelEncoder()
+    a = numpy.load(label_encoder_file_name)
+    labelencoder.fit(a)
+
     for label in reversed(y_sort_index[0,-5:]):
         print str(round(y_output[0,label]*100,2)).zfill(5), "% ", labelencoder.inverse_transform(label)
 
